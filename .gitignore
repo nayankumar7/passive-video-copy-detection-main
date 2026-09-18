@@ -1,0 +1,6 @@
+node_modules/
+data/uploads/
+data/database.json
+__pycache__/
+*.pyc
+.DS_Store

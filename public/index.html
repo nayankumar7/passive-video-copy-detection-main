@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Copyright Detection</title>
+    <meta name="description" content="Detect video copyright infringement using the P-VCD Metric Space approach. Upload, register, and query videos for copy detection.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" stroke="url(#grad1)" stroke-width="2"/>
+                    <circle cx="20" cy="20" r="8" stroke="url(#grad1)" stroke-width="2"/>
+                    <circle cx="20" cy="20" r="3" fill="url(#grad1)"/>
+                    <path d="M20 2 L20 8 M20 32 L20 38 M2 20 L8 20 M32 20 L38 20" stroke="url(#grad1)" stroke-width="1.5" opacity="0.5"/>
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00d4ff"/>
+                            <stop offset="100%" style="stop-color:#7b2ff7"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <span class="brand-text">P-VCD</span>
+            <span class="brand-separator">|</span>
+            <span class="brand-subtitle">Video Copyright Detection</span>
+        </div>
+        <div class="nav-links">
+            <button class="nav-btn active" data-tab="register" id="nav-register">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                Register
+            </button>
+            <button class="nav-btn" data-tab="query" id="nav-query">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                Query
+            </button>
+            <button class="nav-btn" data-tab="database" id="nav-database">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                Database
+            </button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+
+        <!-- ═══ REGISTER TAB ═══ -->
+        <section class="tab-content active" id="tab-register">
+            <div class="section-header">
+                <div class="section-badge">REFERENCE LIBRARY</div>
+                <h1>Register Reference Videos</h1>
+                <p>Add original videos to the reference database. These will be used to detect unauthorized copies.</p>
+            </div>
+
+            <div class="upload-zone" id="register-drop-zone">
+                <div class="upload-zone-inner">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 80 80" fill="none">
+                            <rect x="10" y="20" width="60" height="45" rx="6" stroke="url(#upGrad)" stroke-width="2"/>
+                            <polygon points="40,8 52,24 28,24" fill="url(#upGrad)" opacity="0.6"/>
+                            <path d="M40 24 L40 50" stroke="url(#upGrad)" stroke-width="2"/>
+                            <circle cx="25" cy="38" r="5" stroke="url(#upGrad)" stroke-width="1.5" opacity="0.4"/>
+                            <path d="M15 55 L30 42 L42 52 L55 35 L70 55" stroke="url(#upGrad)" stroke-width="1.5" opacity="0.4"/>
+                            <defs>
+                                <linearGradient id="upGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#00d4ff"/>
+                                    <stop offset="100%" style="stop-color:#7b2ff7"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h3>Drop your videos here</h3>
+                    <p>or click to browse — select multiple files</p>
+                    <span class="upload-formats">MP4, AVI, MKV, MOV, WebM — up to 500MB each</span>
+                    <input type="file" id="register-file-input" accept="video/*" multiple hidden>
+                </div>
+            </div>
+
+            <!-- Multi-file list -->
+            <div class="batch-file-list hidden" id="register-file-list">
+                <div class="batch-header">
+                    <span class="batch-count" id="register-file-count">0 videos selected</span>
+                    <button class="btn-remove" id="register-clear-all" title="Remove all">✕ Clear</button>
+                </div>
+                <div class="batch-items" id="register-file-items"></div>
+                <button class="btn-primary" id="register-submit-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                    Register All Videos
+                </button>
+            </div>
+
+            <!-- Batch processing progress -->
+            <div class="batch-progress hidden" id="register-batch-progress">
+                <div class="batch-progress-header">
+                    <h3 id="register-batch-title">Registering Videos...</h3>
+                    <span class="batch-counter" id="register-batch-counter">0 / 0</span>
+                </div>
+                <div class="batch-progress-bar">
+                    <div class="batch-progress-fill" id="register-progress-fill"></div>
+                </div>
+                <div class="batch-current" id="register-batch-current">Preparing...</div>
+            </div>
+
+            <!-- Batch results -->
+            <div class="batch-results hidden" id="register-batch-results">
+                <div class="result-icon success">✓</div>
+                <h3 id="register-batch-result-title">Registration Complete</h3>
+                <div id="register-batch-result-list"></div>
+            </div>
+
+            <div class="result-card hidden" id="register-error">
+                <div class="result-icon error">✕</div>
+                <h3>Registration Failed</h3>
+                <p id="register-error-msg"></p>
+            </div>
+        </section>
+
+        <!-- ═══ QUERY TAB ═══ -->
+        <section class="tab-content" id="tab-query">
+            <div class="section-header">
+                <div class="section-badge query-badge">COPYRIGHT CHECK</div>
+                <h1>Check for Copies</h1>
+                <p>Upload a video to scan it against all registered references and detect potential copyright violations.</p>
+            </div>
+
+            <div class="upload-zone" id="query-drop-zone">
+                <div class="upload-zone-inner">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 80 80" fill="none">
+                            <circle cx="35" cy="40" r="20" stroke="url(#qGrad)" stroke-width="2"/>
+                            <path d="M50 55 L70 75" stroke="url(#qGrad)" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M28 35 L35 42 L48 30" stroke="url(#qGrad)" stroke-width="2" opacity="0.5"/>
+                            <defs>
+                                <linearGradient id="qGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#ff6b6b"/>
+                                    <stop offset="100%" style="stop-color:#ffa502"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h3>Drop video to analyze</h3>
+                    <p>or click to browse files</p>
+                    <span class="upload-formats">The video will be checked against all registered references</span>
+                    <input type="file" id="query-file-input" accept="video/*" hidden>
+                </div>
+            </div>
+
+            <div class="file-preview hidden" id="query-preview">
+                <div class="file-info">
+                    <div class="file-icon">🔍</div>
+                    <div class="file-details">
+                        <span class="file-name" id="query-file-name"></span>
+                        <span class="file-size" id="query-file-size"></span>
+                    </div>
+                    <button class="btn-remove" id="query-remove-file" title="Remove file">✕</button>
+                </div>
+                <button class="btn-primary btn-query" id="query-submit-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    Scan for Copies
+                </button>
+            </div>
+
+            <div class="processing-card hidden" id="query-processing">
+                <div class="processing-animation">
+                    <div class="ring ring-1 ring-query"></div>
+                    <div class="ring ring-2 ring-query"></div>
+                    <div class="ring ring-3 ring-query"></div>
+                    <div class="processing-core core-query"></div>
+                </div>
+                <h3 id="query-processing-title">Analyzing Video...</h3>
+                <p id="query-processing-msg">Running similarity search against reference database</p>
+                <div class="pipeline-steps" id="query-pipeline">
+                    <div class="pipeline-step" data-step="preprocess">
+                        <div class="step-dot"></div>
+                        <span>Preprocessing</span>
+                    </div>
+                    <div class="pipeline-connector"></div>
+                    <div class="pipeline-step" data-step="segment">
+                        <div class="step-dot"></div>
+                        <span>Segmentation</span>
+                    </div>
+                    <div class="pipeline-connector"></div>
+                    <div class="pipeline-step" data-step="extract">
+                        <div class="step-dot"></div>
+                        <span>Feature Extraction</span>
+                    </div>
+                    <div class="pipeline-connector"></div>
+                    <div class="pipeline-step" data-step="search">
+                        <div class="step-dot"></div>
+                        <span>Similarity Search</span>
+                    </div>
+                    <div class="pipeline-connector"></div>
+                    <div class="pipeline-step" data-step="localize">
+                        <div class="step-dot"></div>
+                        <span>Copy Localization</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-card hidden" id="query-result">
+                <div id="query-result-header"></div>
+                <div id="query-result-body"></div>
+            </div>
+
+            <div class="result-card hidden" id="query-error">
+                <div class="result-icon error">✕</div>
+                <h3>Query Failed</h3>
+                <p id="query-error-msg"></p>
+            </div>
+        </section>
+
+        <!-- ═══ DATABASE TAB ═══ -->
+        <section class="tab-content" id="tab-database">
+            <div class="section-header">
+                <div class="section-badge db-badge">METRIC SPACE</div>
+                <h1>Reference Database</h1>
+                <p>View and manage registered reference videos and their descriptor indices.</p>
+            </div>
+
+            <div class="db-stats" id="db-stats">
+                <div class="stat-card" id="stat-videos">
+                    <div class="stat-value">-</div>
+                    <div class="stat-label">Videos</div>
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="2.18"/>
+                            <path d="m10 8 6 4-6 4V8Z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-card" id="stat-descriptors">
+                    <div class="stat-value">-</div>
+                    <div class="stat-label">Descriptors</div>
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2 L22 8.5 L22 15.5 L12 22 L2 15.5 L2 8.5 Z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-card" id="stat-segments">
+                    <div class="stat-value">-</div>
+                    <div class="stat-label">Segments</div>
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="db-video-list" id="db-video-list">
+                <div class="db-empty" id="db-empty">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 80 80" fill="none">
+                            <ellipse cx="40" cy="20" rx="30" ry="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M10 20v30c0 5.52 13.43 10 30 10s30-4.48 30-10V20" stroke="currentColor" stroke-width="2"/>
+                            <path d="M10 35c0 5.52 13.43 10 30 10s30-4.48 30-10" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+                        </svg>
+                    </div>
+                    <h3>No videos registered</h3>
+                    <p>Register reference videos to start detecting copies.</p>
+                </div>
+            </div>
+
+            <div class="db-actions">
+                <button class="btn-secondary" id="db-refresh-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.5 2v6h-6"/><path d="M2.5 22v-6h6"/>
+                        <path d="M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                    </svg>
+                    Refresh
+                </button>
+                <button class="btn-danger" id="db-clear-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                    Clear Database
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Pipeline Architecture Diagram (footer) -->
+    <footer class="footer">
+        <div class="pipeline-diagram">
+            <div class="pipe-node">Upload</div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-node">Preprocess</div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-node">Segment</div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-node">Features</div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-node">Search</div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-node">Localize</div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-node">Results</div>
+        </div>
+        <p class="footer-text">P-VCD — Metric Space Approach for Content-Based Video Copy Detection</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
