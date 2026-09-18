@@ -103,7 +103,7 @@ pvcd-video-copyright/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/
+git clone https://github.com/nayankumar7/passive-video-copy-detection-main.git
 cd passive-video-copy-detection
 ```
 
